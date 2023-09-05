@@ -1,0 +1,26 @@
+---
+# Este playbook lista los usuarios en maquinas windows
+
+- name: Listar usuarios en las maquinas Windows
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Ejecutar script de powershell
+      win_shell: |
+        #Get-WmiObject -Class Win32_UserAccount
+        $adsi = [ADSI]"WinNT://$env:COMPUTERNAME"
+        $adsi.Children | where {$_.SchemaClassName -eq 'user'} | Foreach-Object {
+          $groups = $_.Groups() | Foreach-Object {$_.GetType().InvokeMember("Name", 'GetProperty', $null, $_, $null)}
+          $_ | Select-Object @{n='UserName';e={$_.Name}},@{n='Groups';e={$groups -join ';'}}
+        }
+      register: command
+      #failed_when: command.stderr != "" and command.rc != 0
+      args:
+        #stdin: user
+        stdout: always
+        #contents: "{{ var=command.stdout_lines | replace('\n', '')}}"
+    
+    - name: Imprimir la salida
+      #debug: var=command.stdout_lines
+      #debug: contents
+      debug: msg="{{ command.stdout_lines }}"

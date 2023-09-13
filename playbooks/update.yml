@@ -1,19 +1,41 @@
 ---
 # Este playbook lista los usuarios en máquinas Ubuntu
 
-- name: Listar usuarios en las máquinas Ubuntu
+#- name: Listar usuarios en las máquinas Ubuntu
+#  hosts: all
+#  gather_facts: false
+#  tasks:
+#    - name: Ejecutar comando para listar usuarios
+#      command: getent passwd
+#      register: command
+#      changed_when: false  # Esto evita que el playbook falle si el comando devuelve una salida no vacía
+#      ignore_errors: yes  # Esto evita que el playbook falle si el comando no encuentra usuarios
+#      args:
+#        warn: no
+
+#    - name: Imprimir la salida
+#      debug:
+#        msg: "{{ command.stdout_lines }}"
+
+
+
+
+
+
+# Este playbook actualiza el sistema en las máquinas Ubuntu
+
+- name: Actualizar sistema en las máquinas Ubuntu
   hosts: all
   gather_facts: false
   tasks:
-    - name: Ejecutar comando para listar usuarios
-      #command: getent passwd
-      command: apt update -y
-      register: command
-      changed_when: false  # Esto evita que el playbook falle si el comando devuelve una salida no vacía
-      ignore_errors: yes  # Esto evita que el playbook falle si el comando no encuentra usuarios
-      args:
-        warn: no
+    - name: Actualizar lista de paquetes
+      apt:
+        update_cache: yes
+      become: yes
 
-    - name: Imprimir la salida
-      debug:
-        msg: "{{ command.stdout_lines }}"
+    - name: Actualizar paquetes del sistema
+      apt:
+        upgrade: yes
+        autoclean: yes
+      become: yes
+

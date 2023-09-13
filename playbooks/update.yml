@@ -1,16 +1,23 @@
 ---
 - name: Update and reboot
-  # note: your 'hosts' section will likely be different as this is a group I created for my Red Hat hosts in Ansible Tower itself.
-  hosts: rhel_hosts
-  gather_facts: no
+  hosts: Linux_Machines  # Cambia esto al grupo de hosts de Ubuntu en tu inventario
+  gather_facts: yes  # Cambia esto a "yes" si deseas recopilar información sobre los hosts
+
   tasks:
-    - name: Upgrade all packages
-      yum:
+    - name: Update package cache on Ubuntu
+      apt:
+        update_cache: yes
+      become: yes  # Ejecutar como superusuario para actualizar la caché de paquetes
+
+    - name: Upgrade all packages on Ubuntu
+      apt:
         name: '*'
-        state: lat
-      
-    - name: Reboot servers
+        state: latest  # Utiliza "latest" para actualizar los paquetes en Ubuntu
+        autoclean: yes  # Opcional: para limpiar paquetes obsoletos
+      become: yes
+
+    - name: Reboot servers on Ubuntu
       reboot:
         pre_reboot_delay: 90
         msg: "!!!Attention, server will be rebooted in 90 seconds!!!"
-...
+      become: yes

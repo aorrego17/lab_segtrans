@@ -6,7 +6,8 @@
   gather_facts: false
   tasks:
     - name: Ejecutar comando para listar usuarios
-      command: getent passwd
+      #command: getent passwd
+      command: apt update -y
       register: command
       changed_when: false  # Esto evita que el playbook falle si el comando devuelve una salida no vacía
       ignore_errors: yes  # Esto evita que el playbook falle si el comando no encuentra usuarios

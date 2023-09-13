@@ -1,23 +1,18 @@
 ---
-- name: Update and reboot
-  hosts: ubuntu_hosts  # Cambia esto al grupo de hosts de Ubuntu en tu inventario
-  gather_facts: yes  # Cambia esto a "yes" si deseas recopilar información sobre los hosts
+# Este playbook lista los usuarios en máquinas Ubuntu
 
+- name: Listar usuarios en las máquinas Ubuntu
+  hosts: all
+  gather_facts: false
   tasks:
-    - name: Update package cache on Ubuntu
-      apt:
-        update_cache: yes
-      become: yes  # Ejecutar como superusuario para actualizar la caché de paquetes
+    - name: Ejecutar comando para listar usuarios
+      command: getent passwd
+      register: command
+      changed_when: false  # Esto evita que el playbook falle si el comando devuelve una salida no vacía
+      ignore_errors: yes  # Esto evita que el playbook falle si el comando no encuentra usuarios
+      args:
+        warn: no
 
-    - name: Upgrade all packages on Ubuntu
-      apt:
-        name: '*'
-        state: latest  # Utiliza "latest" para actualizar los paquetes en Ubuntu
-        autoclean: yes  # Opcional: para limpiar paquetes obsoletos
-      become: yes
-
-    - name: Reboot servers on Ubuntu
-      reboot:
-        pre_reboot_delay: 90
-        msg: "!!!Attention, server will be rebooted in 90 seconds!!!"
-      become: yes
+    - name: Imprimir la salida
+      debug:
+        msg: "{{ command.stdout_lines }}"

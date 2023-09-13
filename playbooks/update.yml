@@ -1,6 +1,6 @@
 ---
 - name: Update and reboot
-  hosts: Linux_Machines  # Cambia esto al grupo de hosts de Ubuntu en tu inventario
+  hosts: ubuntu_hosts  # Cambia esto al grupo de hosts de Ubuntu en tu inventario
   gather_facts: yes  # Cambia esto a "yes" si deseas recopilar información sobre los hosts
 
   tasks:

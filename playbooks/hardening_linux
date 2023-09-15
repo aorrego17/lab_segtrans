@@ -1,18 +1,33 @@
 ---
+# Realizar el escaneo de Hardening en Linux
+
 - name: Escaneo de Hardening en Linux
-  hosts: all
+  hosts: localhost
+  gather_facts: no
+  tasks:
+    - name: Definir el nombre del host dinámicamente
+      set_fact:
+        target_host: "nuevo_host"
+
+    - name: Verificar si el host existe en el inventario
+      command: ansible-inventory --list
+      register: inventory_list
+      changed_when: false
+      ignore_errors: true
+
+    - name: Crear el host si no existe en el inventario
+      add_host:
+        name: "{{ target_host }}"
+        groups: "nuevo_grupo"
+      when: "'{{ target_host }}' not in inventory_list.stdout | from_json.keys()"
+
+- name: Realizar el escaneo de hardening
+  hosts: "{{ target_host }}"
   become: yes
   tasks:
-    - name: Actualizar paquetes del sistema
-      package:
-        name: '*'
-        state: latest
-      when: ansible_os_family == "Debian"
-
-    - name: Instalar Lynis (puedes cambiarlo por la herramienta que prefieras)
+    - name: Actualizar paquetes del sistema (solo para sistemas Debian)
       apt:
-        name: lynis
-        state: present
+        update_cache: yes
       when: ansible_os_family == "Debian"
 
     - name: Ejecutar el escaneo Lynis
@@ -25,5 +40,4 @@
       debug:
         var: lynis_result.stdout_lines
 
-    # Agrega más tareas aquí para aplicar configuraciones específicas de hardening.
-
+    # Puedes agregar más tareas de hardening aquí según tus necesidades específicas.

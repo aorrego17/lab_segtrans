@@ -17,25 +17,3 @@
       debug:
         msg: "{{ command.stdout_lines }}"
 
-
-
-
-
-
-# Este playbook actualiza el sistema en las máquinas Ubuntu
-
-#- name: Actualizar sistema en las máquinas Ubuntu
-#  hosts: all
-#  gather_facts: false
-#  tasks:
-#    - name: Actualizar lista de paquetes
-#      apt:
-#        update_cache: yes
-#      become: yes
-
-#    - name: Actualizar paquetes del sistema
-#      apt:
-#        upgrade: yes
-#        autoclean: yes
-#      become: yes
-

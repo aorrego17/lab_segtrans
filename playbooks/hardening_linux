@@ -1,0 +1,29 @@
+---
+- name: Escaneo de Hardening en Linux
+  hosts: all
+  become: yes
+  tasks:
+    - name: Actualizar paquetes del sistema
+      package:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "Debian"
+
+    - name: Instalar Lynis (puedes cambiarlo por la herramienta que prefieras)
+      apt:
+        name: lynis
+        state: present
+      when: ansible_os_family == "Debian"
+
+    - name: Ejecutar el escaneo Lynis
+      command: lynis audit system
+      register: lynis_result
+      ignore_errors: yes
+      changed_when: false
+
+    - name: Imprimir resultados del escaneo
+      debug:
+        var: lynis_result.stdout_lines
+
+    # Agrega más tareas aquí para aplicar configuraciones específicas de hardening.
+

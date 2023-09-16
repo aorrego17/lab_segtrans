@@ -1,13 +1,11 @@
 ---
-# Realizar el escaneo de Hardening en Linux
-
 - name: Escaneo de Hardening en Linux
   hosts: localhost
   gather_facts: no
   tasks:
     - name: Definir el nombre del host dinámicamente
       set_fact:
-        target_host: "nuevo_host"
+        target_host: "mi_servidor"  # Cambia "mi_servidor" al nombre del host que desees
 
     - name: Verificar si el host existe en el inventario
       command: ansible-inventory --list
@@ -19,7 +17,7 @@
       add_host:
         name: "{{ target_host }}"
         groups: "nuevo_grupo"
-      when: "'{{ target_host }}' not in inventory_list.stdout | from_json.keys()"
+      when: "'{{ target_host }}' not in inventory_list.stdout | from_json | default({})"
 
 - name: Realizar el escaneo de hardening
   hosts: "{{ target_host }}"

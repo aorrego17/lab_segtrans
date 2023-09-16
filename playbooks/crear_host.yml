@@ -1,0 +1,12 @@
+---
+- name: Crear Host en el Inventario
+  hosts: localhost
+  gather_facts: no
+  vars:
+    server_name: "{{ lookup('env', 'server_name') }}"  # Obtener el valor de la variable del entorno
+
+  tasks:
+    - name: Crear el host si no existe en el inventario
+      add_host:
+        name: "{{ server_name }}"
+        groups: "Linux_Machines"

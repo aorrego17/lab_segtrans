@@ -5,7 +5,7 @@
   tasks:
     - name: Definir el nombre del host dinámicamente
       set_fact:
-        target_host: "mi_servidor"  # Cambia "mi_servidor" al nombre del host que desees
+        target_host: "172.32.0.28"  # Cambia "mi_servidor" al nombre del host que desees
 
     - name: Verificar si el host existe en el inventario
       command: ansible-inventory --list

@@ -1,49 +1,21 @@
 ---
-- name: Crear Host y Realizar Escaneo de Hardening en Linux
-  hosts: localhost
-  gather_facts: no
+- name: Escaneo de Hardening en Linux
+  hosts: "{{ name }}"
+  become: yes
   tasks:
-    - name: Definir el nombre del host dinámicamente
-      set_fact:
-        target_host: "172.32.0.28"  # Cambia "mi_servidor" al nombre del host que desees
+    - name: Actualizar paquetes del sistema (solo para sistemas Debian)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
 
-    - name: Verificar si el host existe en el inventario
-      command: ansible-inventory --list
-      register: inventory_list
+    - name: Ejecutar el escaneo Lynis
+      command: lynis audit system
+      register: lynis_result
+      ignore_errors: yes
       changed_when: false
-      ignore_errors: true
 
-    - name: Crear el host si no existe en el inventario
-      add_host:
-        name: "{{ target_host }}"
-        groups: "nuevo_grupo"
-      when: "'{{ target_host }}' not in inventory_list.stdout | from_json | default({})"
+    - name: Imprimir resultados del escaneo
+      debug:
+        var: lynis_result.stdout_lines
 
-    - name: Esperar hasta que el host esté disponible en el inventario
-      wait_for:
-        host: "{{ target_host }}"
-        port: 22  # Puedes ajustar el puerto según tus necesidades
-        timeout: 120  # Ajusta el tiempo máximo de espera en segundos
-      delegate_to: localhost
-      ignore_errors: yes  # Ignorar errores de tiempo de espera
-
-    - name: Escaneo de Hardening en Linux
-      hosts: "{{ target_host }}"
-      become: yes
-      tasks:
-        - name: Actualizar paquetes del sistema (solo para sistemas Debian)
-          apt:
-            update_cache: yes
-          when: ansible_os_family == "Debian"
-
-        - name: Ejecutar el escaneo Lynis
-          command: lynis audit system
-          register: lynis_result
-          ignore_errors: yes
-          changed_when: false
-
-        - name: Imprimir resultados del escaneo
-          debug:
-            var: lynis_result.stdout_lines
-
-        # Puedes agregar más tareas de hardening aquí según tus necesidades específicas.
+    # Puedes agregar más tareas de hardening aquí según tus necesidades específicas.

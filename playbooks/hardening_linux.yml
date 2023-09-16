@@ -1,5 +1,5 @@
 ---
-- name: Crear Host si no Existe en el Inventario
+- name: Crear Host y Realizar Escaneo de Hardening en Linux
   hosts: localhost
   gather_facts: no
   tasks:
@@ -18,6 +18,15 @@
         name: "{{ target_host }}"
         groups: "nuevo_grupo"
       when: "'{{ target_host }}' not in inventory_list.stdout | from_json | default({})"
+
+    - name: Esperar hasta que el host esté disponible en el inventario
+      wait_for:
+        host: "{{ target_host }}"
+        port: 22  # Puedes ajustar el puerto según tus necesidades
+        timeout: 120  # Ajusta el tiempo máximo de espera en segundos
+
+    - name: Incluir playbook para realizar el escaneo de hardening
+      include_tasks: escaneo_hardening.yml
 
 - name: Escaneo de Hardening en Linux
   hosts: "{{ target_host }}"

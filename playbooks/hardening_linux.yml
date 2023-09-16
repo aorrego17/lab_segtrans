@@ -27,23 +27,23 @@
       delegate_to: localhost
       ignore_errors: yes  # Ignorar errores de tiempo de espera
 
-    - name: Escaneo de Hardening en Linux
-      hosts: "{{ target_host }}"
-      become: yes
-      tasks:
-        - name: Actualizar paquetes del sistema (solo para sistemas Debian)
-          apt:
-            update_cache: yes
-          when: ansible_os_family == "Debian"
+- name: Escaneo de Hardening en Linux
+  hosts: "{{ target_host }}"
+  become: yes
+  tasks:
+    - name: Actualizar paquetes del sistema (solo para sistemas Debian)
+      apt:
+        update_cache: yes
+      when: ansible_os_family == "Debian"
 
-        - name: Ejecutar el escaneo Lynis
-          command: lynis audit system
-          register: lynis_result
-          ignore_errors: yes
-          changed_when: false
+    - name: Ejecutar el escaneo Lynis
+      command: lynis audit system
+      register: lynis_result
+      ignore_errors: yes
+      changed_when: false
 
-        - name: Imprimir resultados del escaneo
-          debug:
-            var: lynis_result.stdout_lines
+    - name: Imprimir resultados del escaneo
+      debug:
+        var: lynis_result.stdout_lines
 
-        # Puedes agregar más tareas de hardening aquí según tus necesidades específicas.
+    # Puedes agregar más tareas de hardening aquí según tus necesidades específicas.

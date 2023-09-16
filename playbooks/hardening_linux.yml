@@ -1,5 +1,5 @@
 ---
-- name: Escaneo de Hardening en Linux
+- name: Crear Host si no Existe en el Inventario
   hosts: localhost
   gather_facts: no
   tasks:
@@ -19,7 +19,7 @@
         groups: "nuevo_grupo"
       when: "'{{ target_host }}' not in inventory_list.stdout | from_json | default({})"
 
-- name: Realizar el escaneo de hardening
+- name: Escaneo de Hardening en Linux
   hosts: "{{ target_host }}"
   become: yes
   tasks:

@@ -3,10 +3,10 @@
   hosts: localhost
   gather_facts: no
   vars:
-    name: "{{ lookup('env', 'name') }}"  # Obtener el valor de la variable del entorno
+    ip: "{{ lookup('env', 'ip') }}"  # Obtener el valor de la variable del entorno
 
   tasks:
     - name: Crear el host si no existe en el inventario
       add_host:
-        name: "{{ name }}"
+        name: "{{ ip }}"
         groups: "Linux_Machines"
